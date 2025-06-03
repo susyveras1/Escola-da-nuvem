@@ -1,0 +1,79 @@
+✅ Boas práticas de código limpo aplicadas neste exemplo:
+
+1. 🧠 Nomes descritivos e significativos:
+   - Classes, funções e variáveis com nomes claros (ex: `NotificationService`, `user`, `send`).
+
+2. 🔄 Funções pequenas e focadas:
+   - Cada função/método realiza apenas uma tarefa bem definida.
+
+3. 📦 Organização lógica:
+   - Separação de responsabilidades por classe (ex: envio, dados do usuário, orquestração).
+
+4. 🔁 Evitar duplicação:
+   - Uso de herança e abstração para reaproveitar comportamento.
+
+5. 🧱 Baixo acoplamento e alta coesão:
+   - Classes independentes e fáceis de testar, alterar ou estender.
+
+6. 🧪 Código previsível:
+   - Segue padrões comuns, facilitando leitura e manutenção por outros desenvolvedores.
+
+7. 📃 Comentários apenas quando necessário:
+   - O código "fala por si"; comentários explicam apenas o essencial (como princípios aplicados).
+
+------------------------------------------------------------------------------------------------------------------------
+
+🧱 Princípios SOLID aplicados:
+S - Single Responsibility: cada classe tem uma única responsabilidade (ex: User, EmailSender, NotificationService).
+O - Open/Closed: é possível adicionar novos tipos de envio sem modificar o código existente.
+L - Liskov Substitution: classes filhas (EmailSender, SMSSender) substituem a classe base sem quebrar o sistema.
+I - Interface Segregation: usamos apenas os métodos necessários em interfaces (sem sobrecarga).
+D - Dependency Inversion: o serviço depende de uma abstração (NotificationSender), não de implementações concretas.
+
+Esse código serve como base para projetos mais complexos, incentivando uma arquitetura limpa, testável e sustentável.
+
+
+from abc import ABC, abstractmethod
+
+# Princípio S — Single Responsibility (Responsabilidade Única)
+class User:
+    def __init__(self, name: str, email: str, phone: str):
+        self.name = name
+        self.email = email
+        self.phone = phone
+
+# Princípio O — Open/Closed (Aberto para extensão, fechado para modificação)
+class NotificationSender(ABC):
+    @abstractmethod
+    def send(self, user: User, message: str) -> None:
+        pass
+
+# Princípio L — Liskov Substitution (Substituição de Liskov)
+class EmailSender(NotificationSender):
+    def send(self, user: User, message: str) -> None:
+        print(f"📧 Enviando e-mail para {user.email}: {message}")
+
+class SMSSender(NotificationSender):
+    def send(self, user: User, message: str) -> None:
+        print(f"📱 Enviando SMS para {user.phone}: {message}")
+
+# Princípio I — Interface Segregation (Segregação de Interface)
+# Não forçamos a classe a implementar métodos desnecessários — a interface NotificationSender é simples e focada.
+
+# Princípio D — Dependency Inversion (Inversão de Dependência)
+class NotificationService:
+    def __init__(self, sender: NotificationSender):
+        self.sender = sender
+
+    def notify(self, user: User, message: str) -> None:
+        self.sender.send(user, message)
+
+# Uso
+if __name__ == "__main__":
+    user = User("User", "seuemail@email.com", "+xx xx xxxx-xxxx")
+    
+    email_service = NotificationService(EmailSender())
+    email_service.notify(user, "Seu curso de AWS começa hoje às 19h!")
+    
+    sms_service = NotificationService(SMSSender())
+    sms_service.notify(user, "Não se esqueça de revisar Python por 30 minutos hoje!")
